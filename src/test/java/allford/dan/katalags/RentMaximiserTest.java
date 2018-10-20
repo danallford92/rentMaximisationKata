@@ -80,12 +80,9 @@ public class RentMaximiserTest {
                 if (schedule.canAdd(request)) {
                     schedule.add(request);
                 } else {
-                    Schedule backTrack = schedule.copy();
-                    while (!backTrack.canAdd(request)) {
-                        backTrack.pop();
-                    }
-                    backTrack.add(request);
-                    schedules.add(backTrack);
+                    Schedule copy = schedule.copy();
+                    copy.backTrackToAdd(request);
+                    schedules.add(copy);
                 }
             }
         }
@@ -131,6 +128,13 @@ public class RentMaximiserTest {
 
         public void pop() {
             bookings.remove(bookings.size() - 1);
+        }
+
+        public void backTrackToAdd(Request request) {
+            while (!canAdd(request)) {
+                pop();
+            }
+            add(request);
         }
     }
 
