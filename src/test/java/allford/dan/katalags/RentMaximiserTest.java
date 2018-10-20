@@ -42,7 +42,7 @@ public class RentMaximiserTest {
     }
 
     @Test
-    public void whenOneRequestProculdesTwoCheaperRequests_butTheSumOfBothIsGreater() {
+    public void whenOneRequestPrecludesTwoCheaperRequests_butTheSumOfBothIsGreater() {
         Request request1 = new Request("req1", 5, 5, 5);
         Request highestPrice = new Request("highestPrice", 8, 12, 7);
         Request request3 = new Request("req3", 10, 5, 5);
@@ -51,14 +51,13 @@ public class RentMaximiserTest {
     }
 
     @Test
-    public void whenOneRequestProculdesTwoCheaperRequests_andItIsGreaterThanTheSum() {
+    public void whenOneRequestPrecludesTwoCheaperRequests_andItIsGreaterThanTheSum() {
         Request request1 = new Request("req1", 5, 5, 5);
         Request highestPrice = new Request("highestPrice", 8, 12, 20);
         Request request3 = new Request("req3", 10, 5, 5);
 
         assertEquals(asList(highestPrice), maximalRequests(asList(request1, highestPrice, request3)));
     }
-
 
     @Test
     public void performance_shouldBeAbleToProcess5000NonOverLappingRequests() {
