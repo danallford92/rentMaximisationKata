@@ -6,14 +6,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
 import static org.junit.Assert.assertEquals;
 
 public class RentMaximiserTest {
 
+
+    @Test
+    public void noRequests() {
+        assertEquals(emptyList(), maximalRequests(emptyList()));
+    }
+
     @Test
     public void singleRequest_isAccepted() {
         Request request = new Request("AF514", 0, 5, 10);
-        assertEquals(maximalRequests(asList(request)), asList(request));
+        assertEquals(asList(request), maximalRequests(asList(request)));
     }
 
     @Test
@@ -21,8 +28,8 @@ public class RentMaximiserTest {
         Request highestPriceRequest = new Request("Req1", 0, 5, 20);
         Request startingAtSameTimeRequest = new Request("Req2", 0, 2, 10);
 
-        assertEquals(maximalRequests(asList(highestPriceRequest, startingAtSameTimeRequest)), asList(highestPriceRequest));
-        assertEquals(maximalRequests(asList(startingAtSameTimeRequest, highestPriceRequest)), asList(highestPriceRequest));
+        assertEquals(asList(highestPriceRequest), maximalRequests(asList(highestPriceRequest, startingAtSameTimeRequest)));
+        assertEquals(asList(highestPriceRequest), maximalRequests(asList(startingAtSameTimeRequest, highestPriceRequest)));
     }
 
     @Test
@@ -30,21 +37,21 @@ public class RentMaximiserTest {
         Request request1 = new Request("req1", 5, 5, 5);
         Request request2 = new Request("req2", 10, 5, 10);
 
-        assertEquals(maximalRequests(asList(request1, request2)), asList(request1, request2));
+        assertEquals(asList(request1, request2), maximalRequests(asList(request1, request2)));
     }
 
     private List<Request> maximalRequests(List<Request> requests) {
-        Schedule result = new Schedule();
+        Schedule schedule = new Schedule();
         for(Request request: requests) {
-            if(request.startTime >= result.getEndTime()) {
-                result.add(request);
+            if(request.startTime >= schedule.getEndTime()) {
+                schedule.add(request);
             }
-            else if (request.price > result.getLastBooking().price) {
-                result.pop();
-                result.add(request);
+            else if (request.price > schedule.getLastBooking().price) {
+                schedule.pop();
+                schedule.add(request);
             }
         }
-        return result.bookings;
+        return schedule.bookings;
     }
 
     private class Schedule {
