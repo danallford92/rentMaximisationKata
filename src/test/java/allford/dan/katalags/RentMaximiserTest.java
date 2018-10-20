@@ -59,16 +59,33 @@ public class RentMaximiserTest {
         assertEquals(asList(highestPrice), maximalRequests(asList(request1, highestPrice, request3)));
     }
 
+
+    @Test
+    public void performance_shouldBeAbleToProcess5000NonOverLappingRequests() {
+        List<Request> requests = new ArrayList<>();
+        for (int i = 0; i < 5000; i++) {
+            requests.add(new Request("" + i, i, 1, 1));
+        }
+
+        assertEquals(requests, maximalRequests(requests));
+    }
+
     private List<Request> maximalRequests(List<Request> requests) {
         List<Schedule> schedules = new ArrayList<>();
         schedules.add(new Schedule());
-        for(Request request: requests) {
+        for (Request request : requests) {
             int numberOfSchedulesAtStart = schedules.size();
-            for(int n = 0; n < numberOfSchedulesAtStart; n++) {
+            for (int n = 0; n < numberOfSchedulesAtStart; n++) {
                 Schedule schedule = schedules.get(n);
-                if(schedule.canAdd(request)) {
-                    schedules.add(schedule.copy());
+                if (schedule.canAdd(request)) {
                     schedule.add(request);
+                } else {
+                    Schedule backTrack = schedule.copy();
+                    while (!backTrack.canAdd(request)) {
+                        backTrack.pop();
+                    }
+                    backTrack.add(request);
+                    schedules.add(backTrack);
                 }
             }
         }
@@ -90,7 +107,7 @@ public class RentMaximiserTest {
             bookings.add(request);
         }
 
-        public Request getLastBooking () {
+        public Request getLastBooking() {
             return bookings.isEmpty() ? new Request("", 0, 0, 0) : bookings.get(bookings.size() - 1);
         }
 
@@ -110,6 +127,10 @@ public class RentMaximiserTest {
 
         public boolean canAdd(Request request) {
             return request.startTime >= getEndTime();
+        }
+
+        public void pop() {
+            bookings.remove(bookings.size() - 1);
         }
     }
 
