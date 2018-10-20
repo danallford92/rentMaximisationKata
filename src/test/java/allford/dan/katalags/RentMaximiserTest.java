@@ -2,6 +2,7 @@ package allford.dan.katalags;
 
 import org.junit.Test;
 
+import java.util.Arrays;
 import java.util.List;
 
 import static java.util.Arrays.asList;
@@ -15,8 +16,16 @@ public class RentMaximiserTest {
         assertEquals(maximalRequests(asList(request)), asList(request));
     }
 
+    @Test
+    public void whenTwoRequestsHaveSameStartTime_TakesTheOneWithTheHighestPrice() {
+        Request highestPriceRequest = new Request("Req1", 0, 5, 20);
+        Request startingAtSameTimeRequest = new Request("Req2", 0, 2, 10);
+
+        assertEquals(maximalRequests(asList(highestPriceRequest, startingAtSameTimeRequest)), asList(highestPriceRequest));
+    }
+
     private List<Request> maximalRequests(List<Request> requests) {
-        return requests;
+        return Arrays.asList(requests.get(0));
     }
 
     private class Request {
