@@ -3,6 +3,7 @@ package allford.dan.katalags;
 import org.junit.Test;
 
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 
 import static java.util.Arrays.asList;
@@ -22,9 +23,11 @@ public class RentMaximiserTest {
         Request startingAtSameTimeRequest = new Request("Req2", 0, 2, 10);
 
         assertEquals(maximalRequests(asList(highestPriceRequest, startingAtSameTimeRequest)), asList(highestPriceRequest));
+        assertEquals(maximalRequests(asList(startingAtSameTimeRequest, highestPriceRequest)), asList(highestPriceRequest));
     }
 
     private List<Request> maximalRequests(List<Request> requests) {
+        requests.sort(Comparator.comparing(Request::getPrice).reversed());
         return Arrays.asList(requests.get(0));
     }
 
@@ -49,6 +52,10 @@ public class RentMaximiserTest {
                     ", duration=" + duration +
                     ", price=" + price +
                     '}';
+        }
+
+        public int getPrice() {
+            return price;
         }
     }
 }
