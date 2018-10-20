@@ -3,6 +3,7 @@ package allford.dan.katalags;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import static java.util.Arrays.asList;
@@ -40,18 +41,33 @@ public class RentMaximiserTest {
         assertEquals(asList(request1, request2), maximalRequests(asList(request1, request2)));
     }
 
+    @Test
+    public void whenOneRequestProculdesTwoCheaperRequests_butTheSumOfBothIsGreater() {
+        Request request1 = new Request("req1", 5, 5, 5);
+        Request highestPrice = new Request("highestPrice", 8, 12, 7);
+        Request request3 = new Request("req3", 10, 5, 5);
+
+        assertEquals(asList(request1, request3), maximalRequests(asList(request1, highestPrice, request3)));
+    }
+
     private List<Request> maximalRequests(List<Request> requests) {
-        Schedule schedule = new Schedule();
+        List<Schedule> schedules = new ArrayList<>();
+        schedules.add(new Schedule());
         for(Request request: requests) {
-            if(request.startTime >= schedule.getEndTime()) {
-                schedule.add(request);
-            }
-            else if (request.price > schedule.getLastBooking().price) {
-                schedule.pop();
-                schedule.add(request);
+            int numberOfSchedulesAtStart = schedules.size();
+            for(int n = 0; n < numberOfSchedulesAtStart; n++) {
+                Schedule schedule = schedules.get(n);
+                if(request.startTime >= schedule.getEndTime()) {
+                    schedules.add(schedule.copy());
+                    schedule.add(request);
+                }
             }
         }
-        return schedule.bookings;
+
+        return schedules
+                .stream()
+                .max(Comparator.comparingInt(Schedule::getTotalPrice)).get()
+                .bookings;
     }
 
     private class Schedule {
@@ -69,20 +85,26 @@ public class RentMaximiserTest {
             return bookings.isEmpty() ? new Request("", 0, 0, 0) : bookings.get(bookings.size() - 1);
         }
 
-        public void pop() {
-            bookings.remove(bookings.size() - 1);
-        }
-
         public int getEndTime() {
             return getLastBooking().getEndTime();
+        }
+
+        public Schedule copy() {
+            Schedule copy = new Schedule();
+            copy.bookings.addAll(bookings);
+            return copy;
+        }
+
+        public int getTotalPrice() {
+            return bookings.stream().mapToInt(Request::getPrice).sum())
         }
     }
 
     private class Request {
-        String name;
-        int startTime;
-        int duration;
-        int price;
+        final String name;
+        final int startTime;
+        final int duration;
+        final int price;
 
         public Request(String name, int startTime, int duration, int price) {
             this.name = name;
