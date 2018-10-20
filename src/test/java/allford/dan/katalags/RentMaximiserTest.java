@@ -66,7 +66,7 @@ public class RentMaximiserTest {
             int numberOfSchedulesAtStart = schedules.size();
             for(int n = 0; n < numberOfSchedulesAtStart; n++) {
                 Schedule schedule = schedules.get(n);
-                if(request.startTime >= schedule.getEndTime()) {
+                if(schedule.canAdd(request)) {
                     schedules.add(schedule.copy());
                     schedule.add(request);
                 }
@@ -106,6 +106,10 @@ public class RentMaximiserTest {
 
         public int getTotalPrice() {
             return bookings.stream().mapToInt(Request::getPrice).sum();
+        }
+
+        public boolean canAdd(Request request) {
+            return request.startTime >= getEndTime();
         }
     }
 
